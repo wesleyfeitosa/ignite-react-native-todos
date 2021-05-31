@@ -1,15 +1,20 @@
 import React from 'react';
-import { FlatList, TouchableOpacity, View, Text, StyleSheet, FlatListProps } from 'react-native';
+import { FlatList, TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { ThemeColorsProps } from '../pages/Home';
 
-function FlatListHeaderComponent() {
+interface FlatListHeaderProps {
+  textColor: string;
+}
+
+function FlatListHeaderComponent({textColor}: FlatListHeaderProps) {
   return (
     <View>
-      <Text style={styles.header}>Minhas tasks</Text>
+      <Text style={[styles.header, {color: textColor}]}>Minhas tasks</Text>
     </View>
   )
 }
 
-interface MyTasksListProps {
+interface MyTasksListProps extends ThemeColorsProps {
   tasks: {
     id: number;
     title: string;
@@ -19,7 +24,7 @@ interface MyTasksListProps {
   onLongPress: (id: number) => void;
 }
 
-export function MyTasksList({ tasks, onLongPress, onPress }: MyTasksListProps) {
+export function MyTasksList({ tasks, onLongPress, onPress, themeColors }: MyTasksListProps) {
   return (
     <FlatList
       data={tasks}
@@ -31,27 +36,39 @@ export function MyTasksList({ tasks, onLongPress, onPress }: MyTasksListProps) {
             activeOpacity={0.7}
             onLongPress={() => onLongPress(item.id)}
             onPress={() => onPress(item.id)}
-            style={item.done ? styles.taskButtonDone : styles.taskButton}
+            style={
+              item.done ? 
+              [styles.taskButtonDone, {backgroundColor: themeColors.taskDoneBackground}] : 
+              styles.taskButton
+            }
           >
             <View 
               testID={`marker-${index}`}
-              style={item.done ? styles.taskMarkerDone : styles.taskMarker}
+              style={
+                item.done ? 
+                [styles.taskMarkerDone, {backgroundColor: themeColors.markerDone}] : 
+                [styles.taskMarker, {borderColor: themeColors.marker}]
+              }
             />
             <Text 
-              style={item.done ? styles.taskTextDone : styles.taskText}
+              style={
+                item.done ? 
+                [styles.taskTextDone, {color: themeColors.textTaskDone}] : 
+                {color: themeColors.textTask}
+              }
             >
               {item.title}
             </Text>
           </TouchableOpacity>
         )
       }}
-      ListHeaderComponent={<FlatListHeaderComponent />}
+      ListHeaderComponent={<FlatListHeaderComponent textColor={themeColors.text}/>}
       ListHeaderComponentStyle={{
         marginBottom: 20
       }}
       style={{
         marginHorizontal: 24,
-        marginTop: 32
+        marginTop: 32,
       }}
     />
   )
@@ -59,7 +76,6 @@ export function MyTasksList({ tasks, onLongPress, onPress }: MyTasksListProps) {
 
 const styles = StyleSheet.create({
   header: {
-    color: '#3D3D4D',
     fontSize: 24,
     fontFamily: 'Poppins-SemiBold'
   },
@@ -77,11 +93,7 @@ const styles = StyleSheet.create({
     width: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#3D3D4D',
     marginRight: 10
-  },
-  taskText: {
-    color: '#3D3D4D',
   },
   taskButtonDone: {
     flex: 1,
@@ -97,11 +109,9 @@ const styles = StyleSheet.create({
     height: 16,
     width: 16,
     borderRadius: 8,
-    backgroundColor: '#273FAD',
     marginRight: 10
   },
   taskTextDone: {
-    color: '#A09CB1',
     textDecorationLine: 'line-through'
   }
 })
